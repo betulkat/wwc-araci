@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vaka Dosyası · WWC Standartları Değerlendirme Aracı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAEBDF; --paper-line: rgba(47,111,98,0.10); --card:#FBFAF3;
+    --ink:#212D24; --ink-soft:#57635A; --accent:#2F6F62; --accent-dark:#1F4E44; --accent-tint: rgba(47,111,98,0.10);
+    --red:#AE423B; --red-tint: rgba(174,66,59,0.12);
+    --yellow:#B8862B; --yellow-tint: rgba(184,134,43,0.14);
+    --blue:#2C6E9E; --blue-tint: rgba(44,110,158,0.12);
+    --green:#3F7D52; --green-tint: rgba(63,125,82,0.12);
+    --gray:#7C7C70; --gray-tint: rgba(124,124,112,0.14);
+    --ai:#5B4B8A; --ai-tint: rgba(91,75,138,0.09);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: repeating-linear-gradient(0deg, var(--paper-line) 0px, var(--paper-line) 1px, transparent 1px, transparent 28px), var(--paper);
+    font-family:'Inter', sans-serif; color:var(--ink); padding: 40px 16px 80px; min-height:100vh;
+  }
+  .folder{ max-width: 760px; margin: 0 auto; position:relative; }
+  .tab{
+    display:inline-block; background:var(--accent); color:#F4F3E8; font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase; padding:6px 16px 8px; border-radius:6px 6px 0 0;
+    margin-left:28px; position:relative; top:1px;
+  }
+  .sheet{
+    background:var(--card); border:1px solid rgba(33,45,36,0.14); border-radius:2px 10px 10px 10px;
+    box-shadow: 0 1px 0 #fff inset, 0 18px 0 -12px rgba(33,45,36,0.05), 0 26px 0 -18px rgba(33,45,36,0.04), 0 24px 40px -20px rgba(33,45,36,0.25);
+    padding: 36px 40px 44px;
+  }
+  header.case{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 2px solid var(--ink); padding-bottom:18px; margin-bottom: 24px; gap: 20px; }
+  header.case h1{ font-family:'Source Serif 4', serif; font-weight:700; font-size: 25px; line-height:1.25; margin:0 0 6px; }
+  header.case p{ margin:0; color:var(--ink-soft); font-size:14px; font-style:italic; }
+  .case-no{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-align:right; white-space:nowrap; line-height:1.6; }
+  .case-no span{display:block;} .case-no b{color:var(--ink);}
+
+  h2.section-title{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent-dark); margin: 0 0 12px; }
+
+  details.checklist{ border:1px solid rgba(33,45,36,0.15); border-radius:8px; margin-bottom:26px; background: rgba(47,111,98,0.035); }
+  details.checklist summary{ cursor:pointer; list-style:none; padding: 14px 18px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; font-weight:600; letter-spacing:0.04em; color:var(--accent-dark); display:flex; justify-content:space-between; align-items:center; }
+  details.checklist summary::-webkit-details-marker{ display:none; }
+  details.checklist summary::after{ content:"＋ genişlet"; font-weight:500; color:var(--ink-soft); font-size:11px; }
+  details.checklist[open] summary::after{ content:"－ daralt"; }
+  .checklist-body{ padding: 4px 18px 18px; }
+  .checklist-item{ display:flex; gap:10px; padding: 9px 0; border-top:1px dashed rgba(33,45,36,0.14); font-size:13px; }
+  .checklist-item:first-child{ border-top:none; }
+  .checklist-item .ci-id{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:11px; color:var(--accent); min-width:20px; }
+  .checklist-item .ci-text b{ display:block; font-weight:600; margin-bottom:2px; }
+  .checklist-item .ci-text span{ color:var(--ink-soft); font-size:12.5px; }
+  .checklist-item .ci-text .ci-hint{ display:block; color:var(--accent-dark); font-size:12px; margin-top:4px; }
+  .checklist-item .ci-text .ci-hint b{ display:inline; font-weight:700; margin-right:4px; }
+
+  #intake{ margin-bottom: 8px; }
+  .dropzone{ border: 2px dashed rgba(47,111,98,0.45); border-radius:8px; padding: 22px 20px; text-align:center; cursor:pointer; transition: background 0.15s ease, border-color 0.15s ease; }
+  .dropzone:hover, .dropzone.drag{ background: var(--accent-tint); border-color: var(--accent); }
+  .dropzone .glyph{ font-size:20px; margin-bottom:6px; }
+  .dropzone p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .dropzone p.main{ font-weight:600; color:var(--ink); font-size:14.5px; margin-bottom:4px; }
+  #fileInput{ display:none; }
+  .filepill{ display:flex; align-items:center; justify-content:space-between; background: var(--accent-tint); border: 1px solid rgba(47,111,98,0.3); border-radius: 6px; padding: 10px 14px; margin-top: 12px; font-size: 13px; }
+  .filepill .name{ font-family:'IBM Plex Mono', monospace; }
+  .filepill button{ background:none; border:none; color: var(--red); cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; }
+
+  .start-btn{ margin-top: 14px; width:100%; background: var(--ink); color: #F4F3E8; border:none; padding: 14px; border-radius: 6px; font-family:'IBM Plex Mono', monospace; letter-spacing:0.08em; text-transform:uppercase; font-size: 13px; font-weight:600; cursor:pointer; transition: background 0.15s ease; }
+  .start-btn:hover:not(:disabled){ background: var(--accent-dark); }
+  .start-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .perf{ height: 1px; margin: 28px -4px; background-image: radial-gradient(circle, var(--paper) 2.4px, transparent 2.6px); background-size: 14px 1px; background-position: center; border-top: 1px dashed rgba(33,45,36,0.22); }
+
+  #wizard{ display:none; }
+  .crumbs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .crumb{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600; border:1.5px solid rgba(33,45,36,0.25); color:var(--ink-soft); }
+  .crumb.done-E{ border-color:var(--green); color:var(--green); background:var(--green-tint); }
+  .crumb.done-H{ border-color:var(--red); color:var(--red); background:var(--red-tint); }
+  .crumb.current{ border-color:var(--ink); color:var(--ink); font-weight:700; }
+  .crumb.has-ai::after{ content:"🤖"; font-size:8px; position:relative; top:-8px; left:8px; }
+
+  .wcard{ background: rgba(33,45,36,0.03); border:1px solid rgba(33,45,36,0.12); border-radius:8px; padding: 22px 24px; margin-bottom: 18px; }
+  .wcard .wnode{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent-dark); font-weight:600; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px; }
+  .wcard .wq{ font-size:16px; line-height:1.5; font-weight:500; margin-bottom:6px; }
+  .wcard .wguide{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; line-height:1.5; }
+  .whint{
+    background: var(--accent-tint); border-left:3px solid var(--accent); border-radius:0 6px 6px 0;
+    padding:10px 13px; margin-bottom:16px; font-size:12.5px; line-height:1.55; color:var(--accent-dark);
+  }
+  .whint b{ display:block; font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px; color:var(--accent-dark); }
+
+  .ai-suggest{ background: var(--ai-tint); border:1px solid rgba(91,75,138,0.3); border-radius:7px; padding:12px 14px; margin-bottom:16px; }
+  .ai-suggest-head{ font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--ai); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .ai-suggest-g{ font-size:12.5px; color:var(--ink-soft); font-style:italic; margin-bottom:3px; }
+  .ai-suggest-k{ font-size:11.5px; color:var(--ink-soft); }
+  .ai-suggest-k b{ font-family:'IBM Plex Mono', monospace; font-weight:600; text-transform:uppercase; font-size:10px; color:var(--ai); margin-right:4px; }
+  .no-ai-note{ font-size:12.5px; color:var(--ink-soft); font-style:italic; margin-bottom:14px; }
+
+  .conf-tag{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.04em; padding:1px 7px; border-radius:20px; text-transform:uppercase; }
+  .conf-yuksek{ background: var(--green-tint); color: var(--green); }
+  .conf-orta{ background: var(--yellow-tint); color:#7A5B1D; }
+  .conf-dusuk{ background: var(--red-tint); color: var(--red); font-weight:700; }
+
+  .wcard textarea{ width:100%; border:1px solid rgba(33,45,36,0.2); border-radius:6px; padding:9px 11px; font-family:'Inter',sans-serif; font-size:13px; resize:vertical; min-height:52px; margin-bottom:14px; background:#fff; }
+  .wcard label.small{ display:block; font-size:11.5px; color:var(--ink-soft); margin-bottom:5px; font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.04em; }
+  .yn-row{ display:flex; gap:10px; }
+  .yn-btn{ flex:1; padding: 12px; border-radius:6px; border:1.5px solid rgba(33,45,36,0.25); background:#fff; font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600; cursor:pointer; letter-spacing:0.03em; transition: all 0.12s ease; position:relative; }
+  .yn-btn.yes:hover{ background: var(--green-tint); border-color:var(--green); color:var(--green); }
+  .yn-btn.no:hover{ background: var(--red-tint); border-color:var(--red); color:var(--red); }
+  .yn-btn.recommended{ border-color:var(--ai); box-shadow: 0 0 0 3px rgba(91,75,138,0.15); }
+  .yn-btn.recommended::before{ content:"🤖 AI önerisi"; position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--ai); color:#fff; font-size:9px; padding:1px 7px; border-radius:20px; letter-spacing:0.03em; }
+
+  .smd-input{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .smd-input input{ width:120px; padding:10px 12px; border:1.5px solid rgba(33,45,36,0.25); border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:15px; }
+  .smd-input span{ font-size:13px; color:var(--ink-soft); }
+  .smd-preview{ font-size:13px; padding:8px 12px; border-radius:6px; margin-bottom:14px; font-family:'IBM Plex Mono', monospace; background: rgba(33,45,36,0.05); color:var(--ink-soft); }
+  .smd-preview.ok{ background:var(--green-tint); color:var(--green); }
+  .smd-preview.no{ background:var(--yellow-tint); color:#7A5B1D; }
+  .calc-toggle{
+    background:none; border:none; color:var(--accent-dark); font-family:'IBM Plex Mono', monospace; font-size:12px;
+    letter-spacing:0.03em; cursor:pointer; padding:0; margin-bottom:14px; text-decoration:underline; text-underline-offset:2px;
+  }
+  .calc-toggle:hover{ color:var(--accent); }
+  .calc-box{
+    display:none; background: rgba(47,111,98,0.05); border:1px solid rgba(47,111,98,0.25); border-radius:8px;
+    padding:16px 18px; margin-bottom:16px;
+  }
+  .calc-box.open{ display:block; }
+  .calc-box .calc-title{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase; color:var(--accent-dark); font-weight:700; margin-bottom:12px; }
+  .calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .calc-group h4{ margin:0 0 8px; font-size:12.5px; font-weight:600; color:var(--ink); }
+  .calc-field{ margin-bottom:8px; }
+  .calc-field label{ display:block; font-size:11px; color:var(--ink-soft); margin-bottom:3px; font-family:'IBM Plex Mono', monospace; }
+  .calc-field input{ width:100%; padding:7px 9px; border:1px solid rgba(33,45,36,0.22); border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:13px; }
+  .calc-result{ font-size:13px; padding:9px 12px; border-radius:6px; background:#fff; border:1px dashed rgba(47,111,98,0.4); margin-bottom:12px; font-family:'IBM Plex Mono', monospace; color:var(--ink-soft); }
+  .calc-result.ready{ color:var(--accent-dark); font-weight:600; }
+  .calc-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .calc-use-btn{ background:var(--accent); color:#fff; border:none; padding:9px 16px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; cursor:pointer; }
+  .calc-use-btn:hover{ background:var(--accent-dark); }
+  .calc-use-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .calc-external{ font-size:11.5px; color:var(--ink-soft); }
+  .calc-external a{ color:var(--accent-dark); }
+  .confirm-btn{ background:var(--ink); color:#F4F3E8; border:none; padding:11px 20px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; }
+  .confirm-btn:hover{ background:var(--accent-dark); }
+  .confirm-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .wizard-nav{ display:flex; justify-content:space-between; margin-bottom:6px; }
+  .back-link{ background:none; border:none; color:var(--ink-soft); font-size:12.5px; cursor:pointer; font-family:'IBM Plex Mono', monospace; }
+  .back-link:hover{ color:var(--ink); }
+
+  .milestone-card{ border-radius:8px; padding:16px 18px; margin-bottom:18px; font-size:14px; font-weight:600; }
+  .milestone-card.yellow{ background:var(--yellow-tint); color:#7A5B1D; }
+  .milestone-card.gray{ background:var(--gray-tint); color:#4E4E45; }
+  .milestone-card button{ display:block; margin-top:10px; background:var(--ink); color:#F4F3E8; border:none; padding:8px 16px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; font-weight:600; }
+
+  .official-notice{
+    border-radius:10px; padding:22px 24px; margin-bottom:18px; border:2px solid currentColor;
+  }
+  .official-notice.red{ background: var(--red-tint); color: var(--red); }
+  .official-notice.blue{ background: var(--blue-tint); color: var(--blue); }
+  .official-notice.green{ background: var(--green-tint); color: var(--green); }
+  .official-notice-badge{
+    display:inline-block; font-family:'Source Serif 4', serif; font-weight:700; font-size:16px;
+    text-transform:uppercase; letter-spacing:0.02em; border:3px double currentColor; border-radius:8px;
+    padding:8px 16px; margin-bottom:14px;
+  }
+  .official-notice-text{ font-size:14.5px; line-height:1.55; color:var(--ink); margin-bottom:8px; }
+  .official-notice-text b{ color:inherit; }
+  .official-notice-sub{ font-size:12.5px; line-height:1.5; color:var(--ink-soft); margin-bottom:16px; }
+  .official-notice button{
+    background:var(--ink); color:#F4F3E8; border:none; padding:10px 20px; border-radius:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase;
+    cursor:pointer; font-weight:600;
+  }
+
+  #trace{ position:relative; margin-top: 4px; }
+  .rail{ position:absolute; left: 17px; top: 8px; bottom: 8px; width: 2px; background: repeating-linear-gradient(180deg, var(--ink-soft) 0 4px, transparent 4px 8px); opacity:0.35; }
+  .node{ position:relative; padding-left: 46px; margin-bottom: 16px; }
+  .node .badge{ position:absolute; left:0; top:0; width:34px; height:34px; border-radius:50%; background: var(--card); border: 2px solid var(--ink); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:13px; z-index:1; }
+  .node.ans-E .badge{ border-color: var(--green); color: var(--green); }
+  .node.ans-H .badge{ border-color: var(--red); color: var(--red); }
+  .node .q{ font-size: 14px; line-height:1.5; margin: 4px 0 5px; }
+  .node .meta{ display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap; }
+  .pill{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; padding: 2px 9px; border-radius: 20px; font-weight:600; }
+  .pill.E{ background: var(--green-tint); color: var(--green); }
+  .pill.H{ background: var(--red-tint); color: var(--red); }
+  .pill.NA{ background: var(--gray-tint); color: var(--gray); }
+  .node.ans-NA .badge{ border-color: var(--gray); color: var(--gray); }
+  .node.determining{ outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
+  .determ-flag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:700;
+    letter-spacing:0.04em; color:var(--accent-dark); background:var(--accent-tint); padding:2px 9px;
+    border-radius:20px; margin-bottom:6px;
+  }
+  .determ-note{
+    margin-top:12px; font-size:12.5px; color:var(--accent-dark); background:var(--accent-tint);
+    display:inline-block; padding:8px 14px; border-radius:6px; max-width:480px;
+  }
+  .crumb.done-NA{ border-color:var(--gray); color:var(--gray); background:var(--gray-tint); }
+  .node .g{ font-size: 12.5px; color: var(--ink-soft); font-style: italic; border-left: 2px solid rgba(33,45,36,0.15); padding-left: 10px; }
+
+  .milestone{ position:relative; padding: 12px 16px 12px 46px; margin: 4px 0 18px; border-radius: 6px; font-size: 13.5px; font-weight:600; }
+  .milestone .badge{ position:absolute; left:0; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1; background: var(--card); border: 2px solid var(--ink); }
+  .milestone.yellow{ background: var(--yellow-tint); color:#7A5B1D; }
+  .milestone.gray{ background: var(--gray-tint); color:#4E4E45; }
+
+  #verdict{ display:none; margin-top: 22px; text-align:center; }
+  .stamp{ display:inline-block; border: 4px double currentColor; border-radius: 8px; padding: 16px 26px; transform: rotate(-3deg); font-family:'Source Serif 4', serif; font-weight:700; font-size: 19px; letter-spacing: 0.02em; text-transform:uppercase; }
+  .stamp.red{ color: var(--red); } .stamp.blue{ color: var(--blue); } .stamp.green{ color: var(--green); }
+  .verdict-sub{ margin-top:14px; font-size:13.5px; color: var(--ink-soft); max-width: 480px; margin-left:auto; margin-right:auto; }
+
+  #status{ display:none; text-align:center; padding: 14px 0 6px; }
+  .stamp-loading{ display:inline-flex; align-items:center; gap:10px; font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink-soft); }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); animation: pulse 1.1s infinite ease-in-out; }
+  .dot:nth-child(2){ animation-delay:0.15s; } .dot:nth-child(3){ animation-delay:0.3s; }
+  @keyframes pulse{ 0%,80%,100%{ opacity:0.25; transform:scale(0.8);} 40%{ opacity:1; transform:scale(1);} }
+
+  #error{ display:none; background: var(--red-tint); border:1px solid rgba(174,66,59,0.35); color: var(--red); padding: 12px 16px; border-radius:6px; font-size: 13px; margin-top: 14px; }
+
+  .study-meta{ background: rgba(33,45,36,0.035); border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; }
+  .study-meta div{ margin-bottom:3px; }
+  .study-meta b{ font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin-right:6px;}
+
+  footer.note{ margin-top: 26px; padding-top: 16px; border-top: 1px solid rgba(33,45,36,0.14); font-size: 12px; color: var(--ink-soft); display:none; }
+  .reset-btn{ display:block; margin: 22px auto 0; background:none; border: 1px solid var(--ink); color: var(--ink); padding: 9px 18px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+  .reset-btn:hover{ background: var(--ink); color:#F4F3E8; }
+</style>
+</head>
+<body>
+
+<div class="folder">
+  <div class="tab">Vaka Dosyası · WWC v5.0</div>
+  <div class="sheet">
+    <header class="case">
+      <div>
+        <h1>WWC Standartları Değerlendirme Dosyası</h1>
+        <p>WWC Standartları karar ağacı üzerinden interaktif metodoloji değerlendirmesi.</p>
+      </div>
+      <div class="case-no">
+        <span>DOSYA NO <b id="caseNo">—</b></span>
+        <span>MODÜL: EĞİTİM / ARAŞTIRMA</span>
+      </div>
+    </header>
+
+    <details class="checklist" id="checklistBox">
+      <summary><span>Değerlendirilecek Ölçütler (13 madde)</span></summary>
+      <div class="checklist-body" id="checklistBody"></div>
+    </details>
+
+    <section id="intake">
+      <h2 class="section-title">1 · Başlangıç Seçeneği</h2>
+      <div class="dropzone" id="dropzone">
+        <div class="glyph">📎</div>
+        <p class="main">Makaleyi buraya bırakın veya seçmek için tıklayın</p>
+        <p>Yalnızca PDF · Dosya seçildiğinde AI butonu aktifleşir</p>
+      </div>
+      <input type="file" id="fileInput" accept="application/pdf" />
+      <div class="filepill" id="filepill" style="display:none;">
+        <span class="name" id="fileName"></span>
+        <button id="clearFile">Kaldır ✕</button>
+      </div>
+      <button class="start-btn" id="startBtn" disabled>AI ile İlk Değerlendirmeyi Yap</button>
+      
+      <div style="display:flex; align-items:center; margin: 18px 0; gap: 12px;">
+        <div style="flex:1; height:1px; background:rgba(33,45,36,0.15);"></div>
+        <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase;">veya doğrudan kendiniz değerlendirin</span>
+        <div style="flex:1; height:1px; background:rgba(33,45,36,0.15);"></div>
+      </div>
+
+      <div id="manualMetaInputs" style="margin-bottom:12px;">
+        <input type="text" id="manualTitle" placeholder="Makale / Çalışma Adı (Opsiyonel)" style="width:100%; padding:9px 11px; border:1px solid rgba(33,45,36,0.2); border-radius:6px; font-family:'Inter',sans-serif; font-size:13px; margin-bottom:8px;" />
+        <input type="text" id="manualOutcome" placeholder="Değerlendirilen Birincil Sonuç Ölçümü (Opsiyonel)" style="width:100%; padding:9px 11px; border:1px solid rgba(33,45,36,0.2); border-radius:6px; font-family:'Inter',sans-serif; font-size:13px;" />
+      </div>
+
+      <button class="start-btn" id="manualStartBtn" style="background:var(--accent-dark); margin-top:4px;">Manuel Değerlendirmeyi Başlat</button>
+      <div id="error"></div>
+    </section>
+
+    <div id="status">
+      <div class="stamp-loading"><span id="statusText">İnceleniyor</span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    </div>
+
+    <div class="perf" id="perf1" style="display:none;"></div>
+
+    <div id="wizard">
+      <h2 class="section-title">2 · Karar Ağacı Adımları</h2>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="wizard-nav">
+        <button class="back-link" id="backBtn" style="visibility:hidden;">← Bir önceki maddeye dön</button>
+      </div>
+      <div id="wcardHost"></div>
+    </div>
+
+    <div class="perf" id="perf2" style="display:none;"></div>
+
+    <div id="resultsArea" style="display:none;">
+      <h2 class="section-title">3 · Değerlendirme Özeti ve Karar</h2>
+      <div class="study-meta" id="studyMeta" style="display:none;"></div>
+      <div class="rail" id="rail" style="display:none;"></div>
+      <div id="trace"></div>
+      <div id="verdict"></div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn" style="display:none;">Yeni Değerlendirme</button>
+
+    <footer class="note" id="note">
+      Bu dosyadaki değerlendirme, çalışma önceki bir ölçütte standardı karşılamasa bile TÜM ölçütler
+      üzerinden tamamlanır — süreç hiçbir maddede erken durdurulmaz. Bazı ölçütler (H, I, M), çalışmanın
+      araştırma desenine bağlı olarak "Uygulanamaz" (N/A) işaretlenebilir. Resmi WWC kararı ise ayrıca,
+      sabit karar ağacı mantığıyla hangi tek ölçütün belirleyici olduğu açıkça gösterilerek hesaplanır.
+    </footer>
+  </div>
+</div>
+
+<script>
+const GRAPH = {
+  A: { type:'bool', q:"Çalışma, en az bir sonuç ölçümü için görünüş geçerliğine (face validity) ilişkin kanıt sunmakta mıdır?",
+       guide:"Kullanılan ölçme aracının, ölçmeyi amaçladığı yapıyı gerçekten ölçtüğüne dair en az bir sonuç ölçümü için kanıt bulunmalıdır.",
+       ipucu:"Yöntem bölümünün \"Veri Toplama Araçları\" ya da \"Ölçme Araçları\" kısmına bakınız; aracın geliştirilme süreci, kapsam ve görünüş geçerliğine ilişkin açıklamalar ile varsa uzman görüşüne dayalı çalışmalar genellikle bu kısımda raporlanır.",
+       yes:'B', no:'RED' },
+  B: { type:'bool', q:"Çalışma, ilgili ölçüm için güvenirlik kanıtı sunmakta mıdır (ya da idari kayıtlar gibi bu koşuldan muaf mıdır)?",
+       guide:"İlgili ölçüm için güvenirlik kanıtı (test-tekrar test, iç tutarlılık, puanlayıcılar arası güvenirlik vb.) sunulmalı ya da idari kayıt gibi bir muafiyet gerekçesi belirtilmelidir.",
+       ipucu:"Aynı bölümde genellikle Cronbach alfa katsayısı, test-tekrar test korelasyonu ya da puanlayıcılar arası güvenirlik değerleri raporlanır. İdari kayıt kullanılmışsa bu durum Katılımcılar ya da Veri Toplama Süreci kısmında belirtilir.",
+       yes:'C', no:'RED' },
+  C: { type:'bool', q:"Sonuç ölçümü, içerik açısından müdahale programıyla fazla örtüşmekte (aşırı hizalanmış) mıdır?",
+       guide:"Ölçme aracının, yalnızca müdahale grubunda anlamlı olacak biçimde müdahaleye özgü içerik barındırması, ölçümün tarafsızlığını zedeler.",
+       ipucu:"Ölçme aracının maddelerini müdahale programının içeriğiyle karşılaştırınız; maddelerin genel bir yapıyı mı, yoksa doğrudan müdahalede öğretilen içeriği mi ölçtüğünü kontrol edin.",
+       yes:'RED', no:'D' },
+  D: { type:'bool', q:"Sonuç verisi, müdahale ve karşılaştırma koşullarında tutarlı biçimde toplanmış mıdır?",
+       guide:"Veri toplama yöntemi ve zamanlaması, müdahale ve karşılaştırma gruplarında aynı şekilde uygulanmış olmalıdır.",
+       ipucu:"\"İşlem\" ya da \"Veri Toplama Süreci\" başlığına bakınız; ön test-son test uygulama zamanlamasının ve uygulayıcının her iki grup için aynı olup olmadığını kontrol edin.",
+       yes:'E', no:'RED' },
+  E: { type:'bool', q:"Çalışmada bir karıştırıcı değişken (confound) bulunmakta mıdır (örn. N=1 karıştırıcısı, özellik/zaman karıştırıcısı)?",
+       guide:"Çalışmanın iç geçerliğini zedeleyebilecek bir karıştırıcı etkenin bulunup bulunmadığı değerlendirilmelidir.",
+       ipucu:"Yöntem bölümündeki \"Araştırma Deseni\" ve \"Katılımcılar\" kısımlarını inceleyiniz. Gruplar arasındaki sistematik farklılıklara dikkat edilmelidir.",
+       yes:'RED', no:'F' },
+  F: { milestone:true, icon:'★', label:"Çalışma, kapsamlı incelemeye uygundur.", color:'yellow', next:'G' },
+  G: { type:'bool', q:"Grup ataması, seçkisiz atama (random assignment) yoluyla mı gerçekleştirilmiştir?",
+       guide:"Katılımcıların gruplara atanmasının seçkisiz atama yoluyla yapılıp yapılmadığı belirlenmelidir.",
+       ipucu:"\"Katılımcılar\" ya da \"Araştırma Deseni\" kısmına bakınız; seçkisiz atama, kura ya da rastgele atamaya ilişkin ifadeler aranmalıdır.",
+       yes:'H', no:'K' },
+  H: { type:'bool', q:"Birimler, her koşula sıfırdan farklı bir atanma olasılığıyla tamamen şansa bağlı olarak mı atanmıştır (iyi uygulanmış randomizasyon)?",
+       guide:"Randomizasyon sürecinin, herhangi bir atama önyargısına yer bırakmayacak biçimde titizlikle uygulanmış olması gerekir.",
+       ipucu:"Atama sürecinin ayrıntısına bakınız (ör. bilgisayar tarafından üretilen rastgele sayı dizisi, kura çekimi).",
+       yes:'I', no:'K' },
+  I: { type:'bool', q:"WWC'nin kayıp sınırı (attrition-boundary) modeline göre, örneklem kaybı nedeniyle yüksek yanlılık riski bulunmakta mıdır?",
+       guide:"Genel kayıp oranı ile fark kayıp oranı, WWC Tablo C.1'deki sınırlara göre karşılaştırılarak düşük ya da yüksek kayıp olarak sınıflandırılır.",
+       ipucu:"Katılımcılar bölümünde veya CONSORT diyagramında başlangıçtaki ve sondaki örneklem büyüklüklerini karşılaştırınız. Aşağıdaki hesap makinesini kullanabilirsiniz.",
+       yesLabel:'Evet (yüksek örneklem kaybı)', noLabel:'Hayır (düşük örneklem kaybı)',
+       yes:'K', no:'BLUE' },
+  K: { milestone:true, icon:'⚖', label:"Başlangıç düzeyi eşdeğerlik değerlendirmesi gereklidir (QED'ler veya yüksek kayıplı RCT'ler için).", color:'gray', next:'L' },
+  L: { type:'smd', q:"Başlangıç düzeyinde standartlaştırılmış ortalama fark (SMD), ≤ 0.05 SD müdür?",
+       guide:"Gruplar arasındaki başlangıç düzeyi farkının standartlaştırılmış ortalama fark (SMD, mutlak değer) cinsinden büyüklüğünü giriniz.",
+       ipucu:"Bulgular tablosundaki başlangıç düzeyi ortalama ve standart sapmalarını kullanarak aşağıdaki hesaplayıcıdan SMD elde edebilirsiniz.",
+       yes:'GREEN', no:'M' },
+  M: { type:'adjustment', q:"SMD ≤ 0.25 SD müdür VE başlangıç düzeyi farkları için kabul edilebilir bir istatistiksel düzeltme uygulanmış mıdır?",
+       guide:"SMD 0.05–0.25 SD aralığındaysa, kabul edilebilir bir istatistiksel düzeltmenin (ör. ANCOVA) uygulanıp uygulanmadığı belirtilmelidir.",
+       ipucu:"Veri Analizi bölümüne bakınız; ANCOVA veya kovaryans kontrolü yapılıp yapılmadığını kontrol edin.",
+       yes:'GREEN', no:'RED' }
+};
+
+const QUESTION_NODES = ['A','B','C','D','E','G','H','I','L','M'];
+const FIXED_SEQUENCE = ['A','B','C','D','E','F','G','H','I','K','L','M'];
+
+function isApplicable(id){
+  if (id === 'H') return !!(answers.G && answers.G.c === 'E');
+  if (id === 'I') return !!(answers.G && answers.G.c === 'E' && answers.H && answers.H.c === 'E');
+  if (id === 'M') return !!(answers.L && answers.L.c === 'H');
+  return true;
+}
+function naMessage(id){
+  if (id === 'H') return 'Grup ataması seçkisiz atama ile yapılmadığı için bu madde uygulanamaz.';
+  if (id === 'I') return 'Çalışma iyi uygulanmış bir randomize deney olmadığı için bu madde uygulanamaz.';
+  if (id === 'M') return 'Başlangıç düzeyi SMD değeri zaten ≤ 0.05 SD eşiğini sağladığı için bu madde uygulanamaz.';
+  return 'Uygulanamaz.';
+}
+
+const ATTR_TABLE = [
+  [5.7,10.0],[5.8,10.1],[5.9,10.2],[5.9,10.3],[6.0,10.4],[6.1,10.5],[6.2,10.7],[6.3,10.8],[6.3,10.9],[6.3,10.9],
+  [6.3,10.9],[6.2,10.9],[6.2,10.9],[6.1,10.8],[6.0,10.8],[5.9,10.7],[5.9,10.6],[5.8,10.5],[5.7,10.3],[5.5,10.2],
+  [5.4,10.0],[5.3,9.9],[5.2,9.7],[5.1,9.5],[4.9,9.4],[4.8,9.2],[4.7,9.0],[4.5,8.8],[4.4,8.6],[4.3,8.4],
+  [4.1,8.2],[4.0,8.0],[3.8,7.8],[3.6,7.6],[3.5,7.4],[3.3,7.2],[3.2,7.0],[3.1,6.7],[2.9,6.5],[2.8,6.3],
+  [2.6,6.0],[2.5,5.8],[2.3,5.6],[2.1,5.3],[2.0,5.1],[1.8,4.9],[1.6,4.6],[1.5,4.4],[1.3,4.2],[1.2,3.9],
+  [1.0,3.7],[0.9,3.5],[0.7,3.2],[0.6,3.0],[0.4,2.8],[0.3,2.6],[0.2,2.3],[0.0,2.1],[null,1.9],[null,1.6],
+  [null,1.4],[null,1.1],[null,0.9],[null,0.7],[null,0.5],[null,0.3]
+];
+function attritionMaxDifferential(overall, cautious){
+  const idx = cautious ? 0 : 1;
+  const clamped = Math.max(0, Math.min(65, overall));
+  const lo = Math.floor(clamped), hi = Math.ceil(clamped);
+  const loVal = ATTR_TABLE[lo][idx], hiVal = ATTR_TABLE[hi][idx];
+  if (loVal === null || hiVal === null) return null;
+  if (lo === hi) return loVal;
+  return loVal + (hiVal - loVal) * (clamped - lo);
+}
+
+const TERMINAL_TEXT = {
+  RED:   "Çalışma, WWC standartlarını karşılamamaktadır.",
+  BLUE:  "Çalışma, WWC standartlarını çekincesiz karşılamaktadır.",
+  GREEN: "Çalışma, WWC standartlarını çekinceli olarak karşılamaktadır."
+};
+
+const CONF_LABEL = { yuksek:'Yüksek güven', orta:'Orta güven', dusuk:'Düşük güven ⚠' };
+const CONF_CLASS = { yuksek:'conf-yuksek', orta:'conf-orta', dusuk:'conf-dusuk' };
+
+const checklistBody = document.getElementById('checklistBody');
+QUESTION_NODES.forEach(id => {
+  const n = GRAPH[id];
+  const div = document.createElement('div');
+  div.className = 'checklist-item';
+  div.innerHTML = '<div class="ci-id">' + id + '</div><div class="ci-text"><b>' + escapeHtml(n.q) + '</b><span>' + escapeHtml(n.guide) + '</span><span class="ci-hint"><b>📍 Nereye bakmalı:</b>' + escapeHtml(n.ipucu || '') + '</span></div>';
+  checklistBody.appendChild(div);
+});
+
+let base64Data = null;
+let aiPath = {};
+let answers = {};
+let history = [];
+let officialLocked = false;
+let officialResult = null;
+let seqIndex = 0;
+let steps = [];
+let finalKey = null;
+let determiningId = null;
+let smdValue = null;
+let studyInfo = {};
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const filepill = document.getElementById('filepill');
+const fileNameEl = document.getElementById('fileName');
+const clearFileBtn = document.getElementById('clearFile');
+const startBtn = document.getElementById('startBtn');
+const manualStartBtn = document.getElementById('manualStartBtn');
+const manualTitle = document.getElementById('manualTitle');
+const manualOutcome = document.getElementById('manualOutcome');
+const errorEl = document.getElementById('error');
+const wizardEl = document.getElementById('wizard');
+const wcardHost = document.getElementById('wcardHost');
+const crumbsEl = document.getElementById('crumbs');
+const backBtn = document.getElementById('backBtn');
+const statusEl = document.getElementById('status');
+const statusText = document.getElementById('statusText');
+const perf1 = document.getElementById('perf1');
+const perf2 = document.getElementById('perf2');
+const resultsArea = document.getElementById('resultsArea');
+const studyMetaEl = document.getElementById('studyMeta');
+const railEl = document.getElementById('rail');
+const traceEl = document.getElementById('trace');
+const verdictEl = document.getElementById('verdict');
+const resetBtn = document.getElementById('resetBtn');
+const noteEl = document.getElementById('note');
+
+document.getElementById('caseNo').textContent = 'VAKA-' + Math.floor(1000 + Math.random()*8999);
+
+dropzone.addEventListener('click', () => fileInput.click());
+['dragover'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+clearFileBtn.addEventListener('click', () => {
+  base64Data = null; filepill.style.display = 'none'; dropzone.style.display = 'block'; fileInput.value = ''; startBtn.disabled = true;
+});
+
+function handleFile(file){
+  if (file.type !== 'application/pdf'){ showError('Yalnızca PDF dosyaları kabul edilir.'); return; }
+  errorEl.style.display = 'none';
+  const reader = new FileReader();
+  reader.onload = () => {
+    base64Data = reader.result.split(',')[1];
+    fileNameEl.textContent = file.name + ' · ' + Math.round(file.size/1024) + ' KB';
+    filepill.style.display = 'flex';
+    dropzone.style.display = 'none';
+    startBtn.disabled = false;
+  };
+  reader.onerror = () => showError('Dosya okunamadı, lütfen tekrar deneyin.');
+  reader.readAsDataURL(file);
+}
+
+function showError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; }
+
+manualStartBtn.addEventListener('click', () => {
+  aiPath = {};
+  studyInfo = {
+    baslik: manualTitle.value.trim() || 'Manuel Değerlendirme',
+    olcum: manualOutcome.value.trim() || 'Belirtilmedi',
+    diger_olcumler: ''
+  };
+  document.getElementById('intake').style.display = 'none';
+  document.getElementById('checklistBox').removeAttribute('open');
+  perf1.style.display = 'block';
+  wizardEl.style.display = 'block';
+  renderCrumbs();
+  advanceSequence();
+});
+
+startBtn.addEventListener('click', async () => {
+  showError('AI ile otomatik analiz için bir arka plan API servisi gereklidir. Lütfen "Manuel Değerlendirmeyi Başlat" butonunu kullanarak devam ediniz.');
+});
+
+function renderCrumbs(){
+  crumbsEl.innerHTML = '';
+  QUESTION_NODES.forEach(id => {
+    const span = document.createElement('span');
+    const a = answers[id];
+    let cls = 'crumb';
+    if (a) cls += ' done-' + a.c;
+    else if (id === FIXED_SEQUENCE[seqIndex]) cls += ' current';
+    if (aiPath[id]) cls += ' has-ai';
+    span.className = cls;
+    span.textContent = id;
+    crumbsEl.appendChild(span);
+  });
+}
+
+function pushHistory(){ history.push({ seqIndex, smdValue, answersSnapshot: JSON.parse(JSON.stringify(answers)), stepsLen: steps.length, officialLocked, officialResult }); }
+
+backBtn.addEventListener('click', () => {
+  if (!history.length) return;
+  const prev = history.pop();
+  seqIndex = prev.seqIndex;
+  smdValue = prev.smdValue;
+  answers = prev.answersSnapshot;
+  steps = steps.slice(0, prev.stepsLen);
+  officialLocked = prev.officialLocked;
+  officialResult = prev.officialResult;
+  renderCrumbs();
+  renderWizardStep();
+});
+
+function advanceSequence(){
+  while (seqIndex < FIXED_SEQUENCE.length){
+    const id = FIXED_SEQUENCE[seqIndex];
+    const node = GRAPH[id];
+    if (node.milestone){ renderWizardStep(); return; }
+    if (!node.milestone && !isApplicable(id)){
+      const msg = naMessage(id);
+      steps.push({ type:'question', id, q:node.q, c:'NA', g:msg, auto:true });
+      answers[id] = { c:'NA', g:msg, auto:true };
+      seqIndex++;
+      continue;
+    }
+    renderWizardStep();
+    return;
+  }
+  finishWizard();
+}
+
+function advanceAfterAnswer(){
+  seqIndex++;
+  renderCrumbs();
+  advanceSequence();
+}
+
+function confBox(sug){
+  if (!sug) return '';
+  const confCls = CONF_CLASS[sug.conf] || 'conf-orta';
+  const confLbl = CONF_LABEL[sug.conf] || 'Orta güven';
+  return '<div class="ai-suggest">' +
+    '<div class="ai-suggest-head">🤖 AI Önerisi <span class="conf-tag ' + confCls + '">' + confLbl + '</span></div>' +
+    (sug.g ? '<div class="ai-suggest-g">' + escapeHtml(sug.g) + '</div>' : '') +
+    (sug.k ? '<div class="ai-suggest-k"><b>Kanıt</b>' + escapeHtml(sug.k) + '</div>' : '') +
+  '</div>';
+}
+
+function renderWizardStep(){
+  backBtn.style.visibility = history.length ? 'visible' : 'hidden';
+  const id = FIXED_SEQUENCE[seqIndex];
+  const node = GRAPH[id];
+
+  if (node.milestone){
+    steps.push({ type:'milestone', ...node });
+    wcardHost.innerHTML = '<div class="milestone-card ' + node.color + '">' + escapeHtml(node.label) + '<button id="msContinue">Devam Et →</button></div>';
+    document.getElementById('msContinue').addEventListener('click', () => { seqIndex++; renderCrumbs(); advanceSequence(); });
+    return;
+  }
+
+  if (node.type === 'bool'){
+    const sug = aiPath[id];
+    const yesRec = sug && sug.c === 'E' ? ' recommended' : '';
+    const noRec = sug && sug.c === 'H' ? ' recommended' : '';
+    const attrCalcHtml = id === 'I' ?
+      '<button type="button" class="calc-toggle" id="attrCalcToggle">🧮 Genel ve fark kayıp oranlarından hesapla (WWC Tablo C.1)</button>' +
+      '<div class="calc-box" id="attrCalcBox">' +
+        '<div class="calc-title">Kayıp Sınırı (Attrition Boundary) Hesap Makinesi — WWC Tablo C.1</div>' +
+        '<div class="calc-field"><label>Genel kayıp oranı (%)</label><input type="number" step="any" min="0" max="100" id="attrOverall" /></div>' +
+        '<div class="calc-field"><label>Fark kayıp oranı (yüzde puan)</label><input type="number" step="any" min="0" max="100" id="attrDiff" /></div>' +
+        '<div class="calc-field"><label>Sınır türü</label>' +
+          '<select id="attrBoundary" style="width:100%; padding:7px 9px; border:1px solid rgba(33,45,36,0.22); border-radius:5px; font-family:\'IBM Plex Mono\',monospace; font-size:13px;">' +
+            '<option value="cautious">Temkinli (cautious)</option>' +
+            '<option value="optimistic">İyimser (optimistic)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div style="font-size:11.5px; color:var(--ink-soft); margin-bottom:10px; line-height:1.55;">' +
+          '<b>İyimser</b> sınır, kaybın müdahaleyle ilişkili olması olası değilse kullanılır. <b>Temkinli</b> sınır ise kaybın müdahaleyle ilişkili olabileceği durumlarda ya da savunulabilir bir gerekçe yoksa WWC tarafından önerilen varsayılandır.' +
+        '</div>' +
+        '<div class="calc-result" id="attrResult">Genel ve fark kayıp oranlarını girin.</div>' +
+        '<div class="calc-actions">' +
+          '<button type="button" class="calc-use-btn" id="attrUseBtn" disabled>Bu Sonuca Göre İşaretle</button>' +
+        '</div>' +
+      '</div>' : '';
+    wcardHost.innerHTML =
+      '<div class="wcard">' +
+        '<div class="wnode">Madde ' + id + '</div>' +
+        '<div class="wq">' + escapeHtml(node.q) + '</div>' +
+        '<div class="wguide">' + escapeHtml(node.guide) + '</div>' +
+        (node.ipucu ? '<div class="whint"><b>📍 Nereye Bakmalısınız?</b>' + escapeHtml(node.ipucu) + '</div>' : '') +
+        attrCalcHtml +
+        (sug ? confBox(sug) : '') +
+        '<label class="small">Not / Karar Gerekçeniz (opsiyonel)</label>' +
+        '<textarea id="noteInput">' + escapeHtml(sug ? sug.g || '' : '') + '</textarea>' +
+        '<div class="yn-row">' +
+          '<button class="yn-btn yes' + yesRec + '" id="btnYes">' + escapeHtml(node.yesLabel || 'EVET') + '</button>' +
+          '<button class="yn-btn no' + noRec + '" id="btnNo">' + escapeHtml(node.noLabel || 'HAYIR') + '</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('btnYes').addEventListener('click', () => answerBool('E'));
+    document.getElementById('btnNo').addEventListener('click', () => answerBool('H'));
+
+    if (id === 'I'){
+      const attrToggle = document.getElementById('attrCalcToggle');
+      const attrBox = document.getElementById('attrCalcBox');
+      attrToggle.addEventListener('click', () => attrBox.classList.toggle('open'));
+      const overallIn = document.getElementById('attrOverall');
+      const diffIn = document.getElementById('attrDiff');
+      const boundarySel = document.getElementById('attrBoundary');
+      const attrResult = document.getElementById('attrResult');
+      const attrUseBtn = document.getElementById('attrUseBtn');
+      let attrLow = null, attrDetail = '';
+      function recalcAttrition(){
+        const overall = parseFloat(overallIn.value);
+        const diff = parseFloat(diffIn.value);
+        const cautious = boundarySel.value === 'cautious';
+        if (isNaN(overall) || isNaN(diff) || overall < 0 || diff < 0){
+          attrResult.textContent = 'Genel ve fark kayıp oranlarını girin.';
+          attrResult.className = 'calc-result';
+          attrUseBtn.disabled = true; attrLow = null; return;
+        }
+        let maxDiffText, isLow;
+        if (overall > 65){
+          isLow = false;
+          maxDiffText = 'Genel kayıp oranı %65 üzerinde — otomatik yüksek kayıp.';
+        } else {
+          const maxDiff = attritionMaxDifferential(overall, cautious);
+          if (maxDiff === null){
+            isLow = false;
+            maxDiffText = 'Bu kayıp oranında düşük kayıp sağlanamaz.';
+          } else {
+            isLow = diff <= maxDiff;
+            maxDiffText = 'İzin verilen en yüksek fark kayıp: ' + maxDiff.toFixed(1) + ' puan.';
+          }
+        }
+        attrResult.innerHTML = maxDiffText + '<br><b>Sonuç: ' + (isLow ? 'DÜŞÜK kayıp' : 'YÜKSEK kayıp') + '</b>';
+        attrResult.className = 'calc-result ready';
+        attrUseBtn.disabled = false;
+        attrLow = isLow;
+        attrDetail = maxDiffText + ' Genel=' + overall + '%, fark=' + diff + ' puan (' + (cautious?'temkinli':'iyimser') + ' sınır).';
+      }
+      [overallIn, diffIn, boundarySel].forEach(el => el.addEventListener('input', recalcAttrition));
+      boundarySel.addEventListener('change', recalcAttrition);
+      attrUseBtn.addEventListener('click', () => {
+        if (attrLow === null) return;
+        document.getElementById('noteInput').value = attrDetail;
+        answerBool(attrLow ? 'H' : 'E');
+      });
+    }
+    return;
+  }
+
+  if (node.type === 'smd'){
+    const sug = aiPath['L'];
+    const prefill = (sug && typeof sug.smd === 'number') ? sug.smd : '';
+    wcardHost.innerHTML =
+      '<div class="wcard">' +
+        '<div class="wnode">Madde L</div>' +
+        '<div class="wq">' + escapeHtml(node.q) + '</div>' +
+        '<div class="wguide">' + escapeHtml(node.guide) + '</div>' +
+        (node.ipucu ? '<div class="whint"><b>📍 Nereye Bakmalısınız?</b>' + escapeHtml(node.ipucu) + '</div>' : '') +
+        '<div class="smd-input"><input type="number" step="0.001" min="0" id="smdField" value="' + prefill + '" placeholder="0.00" /><span>SD</span></div>' +
+        '<div class="smd-preview" id="smdPreview">Bir değer girin.</div>' +
+        '<button type="button" class="calc-toggle" id="calcToggle">🧮 SMD değerini bilmiyorum — ortalama/SS/N değerlerinden hesapla</button>' +
+        '<div class="calc-box" id="calcBox">' +
+          '<div class="calc-title">Başlangıç Düzeyi SMD (Havuzlanmış SS) Hesap Makinesi</div>' +
+          '<div class="calc-grid">' +
+            '<div class="calc-group"><h4>Müdahale Grubu</h4>' +
+              '<div class="calc-field"><label>Ortalama (M)</label><input type="number" step="any" id="calcM1" /></div>' +
+              '<div class="calc-field"><label>Standart Sapma (SS)</label><input type="number" step="any" min="0" id="calcSD1" /></div>' +
+              '<div class="calc-field"><label>N</label><input type="number" step="1" min="2" id="calcN1" /></div>' +
+            '</div>' +
+            '<div class="calc-group"><h4>Karşılaştırma Grubu</h4>' +
+              '<div class="calc-field"><label>Ortalama (M)</label><input type="number" step="any" id="calcM2" /></div>' +
+              '<div class="calc-field"><label>Standart Sapma (SS)</label><input type="number" step="any" min="0" id="calcSD2" /></div>' +
+              '<div class="calc-field"><label>N</label><input type="number" step="1" min="2" id="calcN2" /></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="calc-result" id="calcResult">Her iki grup için ortalama, SS ve N girin.</div>' +
+          '<div class="calc-actions">' +
+            '<button type="button" class="calc-use-btn" id="calcUseBtn" disabled>Hesaplanan Değeri Kullan</button>' +
+          '</div>' +
+        '</div>' +
+        '<button class="confirm-btn" id="smdConfirm" disabled>Onayla ve Devam Et</button>' +
+      '</div>';
+    const field = document.getElementById('smdField');
+    const preview = document.getElementById('smdPreview');
+    const confirm = document.getElementById('smdConfirm');
+    const calcToggle = document.getElementById('calcToggle');
+    const calcBox = document.getElementById('calcBox');
+    calcToggle.addEventListener('click', () => calcBox.classList.toggle('open'));
+    const calcInputs = ['calcM1','calcSD1','calcN1','calcM2','calcSD2','calcN2'].map(id => document.getElementById(id));
+    const calcResult = document.getElementById('calcResult');
+    const calcUseBtn = document.getElementById('calcUseBtn');
+    let calcValue = null;
+    function recalc(){
+      const [m1,sd1,n1,m2,sd2,n2] = calcInputs.map(i => parseFloat(i.value));
+      if ([m1,sd1,n1,m2,sd2,n2].some(v => isNaN(v)) || sd1 < 0 || sd2 < 0 || n1 < 2 || n2 < 2){
+        calcResult.textContent = 'Her iki grup için ortalama, SS ve N girin.';
+        calcResult.className = 'calc-result';
+        calcUseBtn.disabled = true; calcValue = null; return;
+      }
+      const pooledSD = Math.sqrt(((n1-1)*sd1*sd1 + (n2-1)*sd2*sd2) / (n1+n2-2));
+      if (pooledSD === 0){
+        calcResult.textContent = 'Havuzlanmış SS sıfır çıktı — girdileri kontrol edin.';
+        calcResult.className = 'calc-result'; calcUseBtn.disabled = true; calcValue = null; return;
+      }
+      const smd = Math.abs(m1 - m2) / pooledSD;
+      calcValue = smd;
+      calcResult.innerHTML = 'Havuzlanmış SS = ' + pooledSD.toFixed(3) + ' &nbsp;·&nbsp; <b>SMD = ' + smd.toFixed(3) + ' SD</b>';
+      calcResult.className = 'calc-result ready';
+      calcUseBtn.disabled = false;
+    }
+    calcInputs.forEach(i => i.addEventListener('input', recalc));
+    calcUseBtn.addEventListener('click', () => {
+      if (calcValue === null) return;
+      field.value = calcValue.toFixed(3);
+      updatePreview();
+      calcBox.classList.remove('open');
+    });
+    function updatePreview(){
+      const v = parseFloat(field.value);
+      if (isNaN(v) || v < 0){ preview.textContent = 'Bir değer girin.'; preview.className='smd-preview'; confirm.disabled = true; return; }
+      confirm.disabled = false;
+      if (v <= 0.05){ preview.textContent = '≤ 0.05 SD → Baseline eşdeğerlik sağlanıyor (EVET)'; preview.className = 'smd-preview ok'; }
+      else { preview.textContent = '> 0.05 SD → sonraki eşiğe (≤0.25 SD + düzeltme) bakılacak'; preview.className = 'smd-preview no'; }
+    }
+    field.addEventListener('input', updatePreview);
+    if (prefill !== '') updatePreview();
+    confirm.addEventListener('click', () => {
+      const v = parseFloat(field.value);
+      pushHistory();
+      smdValue = v;
+      const c = v <= 0.05 ? 'E' : 'H';
+      steps.push({ type:'question', id:'L', q:node.q, c, g:'Girilen SMD: ' + v.toFixed(3) + ' SD', yesLabel:'EVET', noLabel:'HAYIR' });
+      answers['L'] = { c, g:'Girilen SMD: ' + v.toFixed(3) + ' SD', smd:v };
+      const hit = checkInlineOfficial('L', c);
+      if (hit){ showOfficialNotice('L', hit, () => advanceAfterAnswer()); }
+      else { advanceAfterAnswer(); }
+    });
+    return;
+  }
+
+  if (node.type === 'adjustment'){
+    if (smdValue !== null && smdValue > 0.25){
+      pushHistory();
+      steps.push({ type:'question', id:'M', q:node.q, c:'H', g:'SMD (' + smdValue.toFixed(3) + ' SD) 0.25 SD eşiğini aştığı için otomatik HAYIR.', yesLabel:'EVET', noLabel:'HAYIR' });
+      answers['M'] = { c:'H', g:'SMD 0.25 SD eşiğini aştı (otomatik)', auto:true };
+      const hit = checkInlineOfficial('M', 'H');
+      if (hit){ showOfficialNotice('M', hit, () => advanceAfterAnswer()); }
+      else { advanceAfterAnswer(); }
+      return;
+    }
+    const sug = aiPath['M'];
+    const yesRec = sug && sug.c === 'E' ? ' recommended' : '';
+    const noRec = sug && sug.c === 'H' ? ' recommended' : '';
+    wcardHost.innerHTML =
+      '<div class="wcard">' +
+        '<div class="wnode">Madde M</div>' +
+        '<div class="wq">' + escapeHtml(node.q) + '</div>' +
+        '<div class="wguide">Girdiğiniz SMD (' + (smdValue!==null?smdValue.toFixed(3):'?') + ' SD) ≤ 0.25 SD koşulunu sağlıyor. Kalan koşul: ' + escapeHtml(node.guide) + '</div>' +
+        (node.ipucu ? '<div class="whint"><b>📍 Nereye Bakmalısınız?</b>' + escapeHtml(node.ipucu) + '</div>' : '') +
+        (sug ? confBox(sug) : '') +
+        '<label class="small">Not / Gerekçe (opsiyonel)</label>' +
+        '<textarea id="noteInput">' + escapeHtml(sug ? sug.g || '' : '') + '</textarea>' +
+        '<div class="yn-row">' +
+          '<button class="yn-btn yes' + yesRec + '" id="btnYes">EVET</button>' +
+          '<button class="yn-btn no' + noRec + '" id="btnNo">HAYIR</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('btnYes').addEventListener('click', () => answerBool('E'));
+    document.getElementById('btnNo').addEventListener('click', () => answerBool('H'));
+    return;
+  }
+}
+
+function checkInlineOfficial(id, c){
+  if (officialLocked) return null;
+  const node = GRAPH[id];
+  const target = c === 'E' ? node.yes : node.no;
+  if (target === 'RED' || target === 'BLUE' || target === 'GREEN'){
+    officialLocked = true;
+    officialResult = { finalKey: target, determiningId: id };
+    return target;
+  }
+  return null;
+}
+
+function showOfficialNotice(id, finalKeyHit, continueCallback){
+  const colorClass = finalKeyHit.toLowerCase();
+  const stampText = finalKeyHit === 'RED' ? 'Standartları Karşılamamaktadır' : finalKeyHit === 'BLUE' ? 'Çekincesiz Karşılamaktadır' : 'Çekinceli Karşılamaktadır';
+  wcardHost.innerHTML =
+    '<div class="official-notice ' + colorClass + '">' +
+      '<div class="official-notice-badge">' + stampText + '</div>' +
+      '<div class="official-notice-text">Madde ' + id + ' cevabınıza göre, resmi WWC karar ağacı mantığında değerlendirme <b>burada sonlanırdı</b>: ' + escapeHtml(TERMINAL_TEXT[finalKeyHit]) + '</div>' +
+      '<div class="official-notice-sub">Bu, resmi kararı belirleyen madde olarak kaydedildi. Şimdi çalışmanın tam profilini görebilmeniz için kalan tüm maddelerin değerlendirmesine devam ediyoruz.</div>' +
+      '<button id="officialContinue">Değerlendirmeye Devam Et →</button>' +
+    '</div>';
+  document.getElementById('officialContinue').addEventListener('click', continueCallback);
+}
+
+function answerBool(c){
+  const id = FIXED_SEQUENCE[seqIndex];
+  const node = GRAPH[id];
+  const note = (document.getElementById('noteInput') || {}).value || '';
+  pushHistory();
+  steps.push({ type:'question', id, q:node.q, c, g:note, yesLabel:node.yesLabel, noLabel:node.noLabel });
+  answers[id] = { c, g:note };
+  renderCrumbs();
+  const hit = checkInlineOfficial(id, c);
+  if (hit){ showOfficialNotice(id, hit, () => advanceAfterAnswer()); }
+  else { advanceAfterAnswer(); }
+}
+
+function officialVerdict(){
+  let cur = 'A';
+  let determining = null;
+  let guard = 0;
+  while (guard++ < 30){
+    if (cur === 'RED' || cur === 'BLUE' || cur === 'GREEN') return { finalKey: cur, determiningId: determining };
+    const node = GRAPH[cur];
+    if (!node) break;
+    if (node.milestone){ cur = node.next; continue; }
+    const a = answers[cur];
+    if (!a || (a.c !== 'E' && a.c !== 'H')) return { finalKey: null, determiningId: determining };
+    determining = cur;
+    cur = a.c === 'E' ? node.yes : node.no;
+  }
+  return { finalKey: null, determiningId: determining };
+}
+
+function finishWizard(){
+  wizardEl.style.display = 'none';
+  perf2.style.display = 'block';
+  resultsArea.style.display = 'block';
+  railEl.style.display = 'block';
+
+  let metaHtml = '<div><b>Çalışma</b>' + escapeHtml(studyInfo.baslik || '—') + '</div>' +
+                 '<div><b>Değerlendirilen Ölçüm</b>' + escapeHtml(studyInfo.olcum || '—') + '</div>';
+  studyMetaEl.innerHTML = metaHtml;
+  studyMetaEl.style.display = 'block';
+
+  const result = officialResult || officialVerdict();
+  finalKey = result.finalKey;
+  determiningId = result.determiningId;
+
+  renderTrace(traceEl, steps, determiningId);
+  verdictEl.innerHTML = finalKey ? stampFor(finalKey, determiningId) :
+    '<div class="verdict-sub" style="color:var(--yellow); font-weight:600;">Resmi karar hesaplanamadı — lütfen madde kayıtlarını kontrol edin.</div>';
+  verdictEl.style.display = 'block';
+  resetBtn.style.display = 'block';
+  noteEl.style.display = 'block';
+}
+
+resetBtn.addEventListener('click', () => location.reload());
+
+function stampFor(key, determId){
+  const colorClass = key.toLowerCase();
+  const stampText = key === 'RED' ? 'Standartları Karşılamamaktadır' : key === 'BLUE' ? 'Çekincesiz Karşılamaktadır' : 'Çekinceli Karşılamaktadır';
+  let determHtml = '';
+  if (determId && GRAPH[determId]){
+    determHtml = '<div class="determ-note"><b>Belirleyici madde:</b> ' + determId + ' — ' + escapeHtml(GRAPH[determId].q) + '</div>';
+  }
+  return '<div class="stamp ' + colorClass + '">' + stampText + '</div>' +
+         '<div class="verdict-sub">' + escapeHtml(TERMINAL_TEXT[key]) + '</div>' +
+         determHtml;
+}
+
+function renderTrace(container, list, determId){
+  container.innerHTML = '';
+  list.forEach(s => {
+    if (s.type === 'milestone'){
+      const div = document.createElement('div');
+      div.className = 'milestone ' + s.color;
+      div.innerHTML = '<span class="badge">' + s.icon + '</span>' + escapeHtml(s.label);
+      container.appendChild(div);
+    } else {
+      const div = document.createElement('div');
+      div.className = 'node ans-' + s.c + (determId && s.id === determId ? ' determining' : '');
+      const label = s.c === 'NA' ? 'Uygulanamaz' : (s.c === 'E' ? (s.yesLabel || 'EVET') : (s.noLabel || 'HAYIR'));
+      div.innerHTML =
+        '<div class="badge">' + s.id + '</div>' +
+        (determId && s.id === determId ? '<div class="determ-flag">🏛 Resmi kararı belirleyen madde</div>' : '') +
+        '<div class="meta"><span class="pill ' + s.c + '">' + escapeHtml(label) + '</span></div>' +
+        '<div class="q">' + escapeHtml(s.q) + '</div>' +
+        (s.g ? '<div class="g">' + escapeHtml(s.g) + '</div>' : '');
+      container.appendChild(div);
+    }
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
