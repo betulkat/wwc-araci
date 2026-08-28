@@ -67,6 +67,12 @@
   .filepill .name{ font-family:'IBM Plex Mono', monospace; }
   .filepill button{ background:none; border:none; color: var(--red); cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; }
 
+  .api-box{ background: rgba(91,75,138,0.06); border: 1px solid rgba(91,75,138,0.25); border-radius: 6px; padding: 12px 14px; margin-top: 14px; }
+  .api-box label{ display:block; font-size: 11px; font-family:'IBM Plex Mono', monospace; font-weight:600; color:var(--ai); margin-bottom: 6px; text-transform:uppercase; }
+  .api-box input{ width:100%; padding: 8px 10px; border: 1px solid rgba(33,45,36,0.2); border-radius: 5px; font-family:'IBM Plex Mono', monospace; font-size: 12.5px; }
+  .api-box .hint{ font-size: 11px; color:var(--ink-soft); margin-top: 4px; }
+  .api-box .hint a{ color:var(--accent-dark); }
+
   .start-btn{ margin-top: 14px; width:100%; background: var(--ink); color: #F4F3E8; border:none; padding: 14px; border-radius: 6px; font-family:'IBM Plex Mono', monospace; letter-spacing:0.08em; text-transform:uppercase; font-size: 13px; font-weight:600; cursor:pointer; transition: background 0.15s ease; }
   .start-btn:hover:not(:disabled){ background: var(--accent-dark); }
   .start-btn:disabled{ opacity:0.4; cursor:not-allowed; }
@@ -93,6 +99,8 @@
 
   .ai-suggest{ background: var(--ai-tint); border:1px solid rgba(91,75,138,0.3); border-radius:7px; padding:12px 14px; margin-bottom:16px; }
   .ai-suggest-head{ font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--ai); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .ai-suggest-ans{ font-size:13.5px; margin-bottom:4px; }
+  .ai-suggest-ans b{ color:var(--ai); }
   .ai-suggest-g{ font-size:12.5px; color:var(--ink-soft); font-style:italic; margin-bottom:3px; }
   .ai-suggest-k{ font-size:11.5px; color:var(--ink-soft); }
   .ai-suggest-k b{ font-family:'IBM Plex Mono', monospace; font-weight:600; text-transform:uppercase; font-size:10px; color:var(--ai); margin-right:4px; }
@@ -140,8 +148,6 @@
   .calc-use-btn{ background:var(--accent); color:#fff; border:none; padding:9px 16px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; cursor:pointer; }
   .calc-use-btn:hover{ background:var(--accent-dark); }
   .calc-use-btn:disabled{ opacity:0.4; cursor:not-allowed; }
-  .calc-external{ font-size:11.5px; color:var(--ink-soft); }
-  .calc-external a{ color:var(--accent-dark); }
   .confirm-btn{ background:var(--ink); color:#F4F3E8; border:none; padding:11px 20px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; }
   .confirm-btn:hover{ background:var(--accent-dark); }
   .confirm-btn:disabled{ opacity:0.4; cursor:not-allowed; }
@@ -240,7 +246,7 @@
       </div>
       <div class="case-no">
         <span>DOSYA NO <b id="caseNo">—</b></span>
-        <span>MODÜL: EĞİTİM / ARAŞTIRMA</span>
+        <span>MODÜL: AI DESTEKLİ / EĞİTİM</span>
       </div>
     </header>
 
@@ -250,7 +256,7 @@
     </details>
 
     <section id="intake">
-      <h2 class="section-title">1 · Başlangıç Seçeneği</h2>
+      <h2 class="section-title">1 · Makaleyi ve API Anahtarını Ekleyin</h2>
       <div class="dropzone" id="dropzone">
         <div class="glyph">📎</div>
         <p class="main">Makaleyi buraya bırakın veya seçmek için tıklayın</p>
@@ -261,11 +267,18 @@
         <span class="name" id="fileName"></span>
         <button id="clearFile">Kaldır ✕</button>
       </div>
-      <button class="start-btn" id="startBtn" disabled>AI ile İlk Değerlendirmeyi Yap</button>
+
+      <div class="api-box">
+        <label>Google Gemini API Anahtarı</label>
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
+        <div class="hint">Anahtarınız yoksa <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a> üzerinden ücretsiz alabilirsiniz. Anahtar sadece tarayıcınızda tutulur.</div>
+      </div>
+
+      <button class="start-btn" id="startBtn" disabled>AI ile Otomatik Değerlendir</button>
       
       <div style="display:flex; align-items:center; margin: 18px 0; gap: 12px;">
         <div style="flex:1; height:1px; background:rgba(33,45,36,0.15);"></div>
-        <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase;">veya doğrudan kendiniz değerlendirin</span>
+        <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase;">veya kendiniz değerlendirin</span>
         <div style="flex:1; height:1px; background:rgba(33,45,36,0.15);"></div>
       </div>
 
@@ -285,7 +298,7 @@
     <div class="perf" id="perf1" style="display:none;"></div>
 
     <div id="wizard">
-      <h2 class="section-title">2 · Karar Ağacı Adımları</h2>
+      <h2 class="section-title">2 · Karar Ağacı Adımları (AI Önerilerini Gözden Geçirin)</h2>
       <div class="crumbs" id="crumbs"></div>
       <div class="wizard-nav">
         <button class="back-link" id="backBtn" style="visibility:hidden;">← Bir önceki maddeye dön</button>
@@ -318,28 +331,28 @@
 const GRAPH = {
   A: { type:'bool', q:"Çalışma, en az bir sonuç ölçümü için görünüş geçerliğine (face validity) ilişkin kanıt sunmakta mıdır?",
        guide:"Kullanılan ölçme aracının, ölçmeyi amaçladığı yapıyı gerçekten ölçtüğüne dair en az bir sonuç ölçümü için kanıt bulunmalıdır.",
-       ipucu:"Yöntem bölümünün \"Veri Toplama Araçları\" ya da \"Ölçme Araçları\" kısmına bakınız; aracın geliştirilme süreci, kapsam ve görünüş geçerliğine ilişkin açıklamalar ile varsa uzman görüşüne dayalı çalışmalar genellikle bu kısımda raporlanır.",
+       ipucu:"Yöntem bölümünün \"Veri Toplama Araçları\" ya da \"Ölçme Araçları\" kısmına bakınız; aracın geliştirilme süreci, kapsam ve görünüş geçerliğine ilişkin açıklamalar genellikle bu kısımda raporlanır.",
        yes:'B', no:'RED' },
   B: { type:'bool', q:"Çalışma, ilgili ölçüm için güvenirlik kanıtı sunmakta mıdır (ya da idari kayıtlar gibi bu koşuldan muaf mıdır)?",
        guide:"İlgili ölçüm için güvenirlik kanıtı (test-tekrar test, iç tutarlılık, puanlayıcılar arası güvenirlik vb.) sunulmalı ya da idari kayıt gibi bir muafiyet gerekçesi belirtilmelidir.",
-       ipucu:"Aynı bölümde genellikle Cronbach alfa katsayısı, test-tekrar test korelasyonu ya da puanlayıcılar arası güvenirlik değerleri raporlanır. İdari kayıt kullanılmışsa bu durum Katılımcılar ya da Veri Toplama Süreci kısmında belirtilir.",
+       ipucu:"Aynı bölümde genellikle Cronbach alfa katsayısı, test-tekrar test korelasyonu ya da puanlayıcılar arası güvenirlik değerleri raporlanır.",
        yes:'C', no:'RED' },
   C: { type:'bool', q:"Sonuç ölçümü, içerik açısından müdahale programıyla fazla örtüşmekte (aşırı hizalanmış) mıdır?",
        guide:"Ölçme aracının, yalnızca müdahale grubunda anlamlı olacak biçimde müdahaleye özgü içerik barındırması, ölçümün tarafsızlığını zedeler.",
-       ipucu:"Ölçme aracının maddelerini müdahale programının içeriğiyle karşılaştırınız; maddelerin genel bir yapıyı mı, yoksa doğrudan müdahalede öğretilen içeriği mi ölçtüğünü kontrol edin.",
+       ipucu:"Ölçme aracının maddelerini müdahale programının içeriğiyle karşılaştırınız.",
        yes:'RED', no:'D' },
   D: { type:'bool', q:"Sonuç verisi, müdahale ve karşılaştırma koşullarında tutarlı biçimde toplanmış mıdır?",
        guide:"Veri toplama yöntemi ve zamanlaması, müdahale ve karşılaştırma gruplarında aynı şekilde uygulanmış olmalıdır.",
-       ipucu:"\"İşlem\" ya da \"Veri Toplama Süreci\" başlığına bakınız; ön test-son test uygulama zamanlamasının ve uygulayıcının her iki grup için aynı olup olmadığını kontrol edin.",
+       ipucu:"\"İşlem\" ya da \"Veri Toplama Süreci\" başlığına bakınız.",
        yes:'E', no:'RED' },
   E: { type:'bool', q:"Çalışmada bir karıştırıcı değişken (confound) bulunmakta mıdır (örn. N=1 karıştırıcısı, özellik/zaman karıştırıcısı)?",
        guide:"Çalışmanın iç geçerliğini zedeleyebilecek bir karıştırıcı etkenin bulunup bulunmadığı değerlendirilmelidir.",
-       ipucu:"Yöntem bölümündeki \"Araştırma Deseni\" ve \"Katılımcılar\" kısımlarını inceleyiniz. Gruplar arasındaki sistematik farklılıklara dikkat edilmelidir.",
+       ipucu:"Yöntem bölümündeki \"Araştırma Deseni\" ve \"Katılımcılar\" kısımlarını inceleyiniz.",
        yes:'RED', no:'F' },
   F: { milestone:true, icon:'★', label:"Çalışma, kapsamlı incelemeye uygundur.", color:'yellow', next:'G' },
   G: { type:'bool', q:"Grup ataması, seçkisiz atama (random assignment) yoluyla mı gerçekleştirilmiştir?",
        guide:"Katılımcıların gruplara atanmasının seçkisiz atama yoluyla yapılıp yapılmadığı belirlenmelidir.",
-       ipucu:"\"Katılımcılar\" ya da \"Araştırma Deseni\" kısmına bakınız; seçkisiz atama, kura ya da rastgele atamaya ilişkin ifadeler aranmalıdır.",
+       ipucu:"\"Katılımcılar\" ya da \"Araştırma Deseni\" kısmına bakınız.",
        yes:'H', no:'K' },
   H: { type:'bool', q:"Birimler, her koşula sıfırdan farklı bir atanma olasılığıyla tamamen şansa bağlı olarak mı atanmıştır (iyi uygulanmış randomizasyon)?",
        guide:"Randomizasyon sürecinin, herhangi bir atama önyargısına yer bırakmayacak biçimde titizlikle uygulanmış olması gerekir.",
@@ -347,7 +360,7 @@ const GRAPH = {
        yes:'I', no:'K' },
   I: { type:'bool', q:"WWC'nin kayıp sınırı (attrition-boundary) modeline göre, örneklem kaybı nedeniyle yüksek yanlılık riski bulunmakta mıdır?",
        guide:"Genel kayıp oranı ile fark kayıp oranı, WWC Tablo C.1'deki sınırlara göre karşılaştırılarak düşük ya da yüksek kayıp olarak sınıflandırılır.",
-       ipucu:"Katılımcılar bölümünde veya CONSORT diyagramında başlangıçtaki ve sondaki örneklem büyüklüklerini karşılaştırınız. Aşağıdaki hesap makinesini kullanabilirsiniz.",
+       ipucu:"Katılımcılar bölümünde veya akış şemasında başlangıç ve bitiş örneklem büyüklüklerini karşılaştırınız.",
        yesLabel:'Evet (yüksek örneklem kaybı)', noLabel:'Hayır (düşük örneklem kaybı)',
        yes:'K', no:'BLUE' },
   K: { milestone:true, icon:'⚖', label:"Başlangıç düzeyi eşdeğerlik değerlendirmesi gereklidir (QED'ler veya yüksek kayıplı RCT'ler için).", color:'gray', next:'L' },
@@ -433,6 +446,7 @@ const filepill = document.getElementById('filepill');
 const fileNameEl = document.getElementById('fileName');
 const clearFileBtn = document.getElementById('clearFile');
 const startBtn = document.getElementById('startBtn');
+const apiKeyInput = document.getElementById('apiKeyInput');
 const manualStartBtn = document.getElementById('manualStartBtn');
 const manualTitle = document.getElementById('manualTitle');
 const manualOutcome = document.getElementById('manualOutcome');
@@ -452,6 +466,14 @@ const traceEl = document.getElementById('trace');
 const verdictEl = document.getElementById('verdict');
 const resetBtn = document.getElementById('resetBtn');
 const noteEl = document.getElementById('note');
+
+// Kayıtlı API Key varsa yükle
+if (localStorage.getItem('gemini_api_key')) {
+  apiKeyInput.value = localStorage.getItem('gemini_api_key');
+}
+apiKeyInput.addEventListener('input', () => {
+  localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
+});
 
 document.getElementById('caseNo').textContent = 'VAKA-' + Math.floor(1000 + Math.random()*8999);
 
@@ -496,8 +518,85 @@ manualStartBtn.addEventListener('click', () => {
   advanceSequence();
 });
 
+const SYSTEM_PROMPT = `Sen, What Works Clearinghouse (WWC) Handbook v5.0 standartlarına göre araştırmaları değerlendiren titiz bir metodoloji uzmanısın. Ekteki PDF makaleyi şu ON (10) ÖLÇÜT üzerinden değerlendir:
+A: Görünüş geçerliği (face validity) kanıtı var mı?
+B: Güvenirlik kanıtı var mı (veya idari kayıt muafiyeti)?
+C: Sonuç ölçümü müdahale ile aşırı hizalanmış mı?
+D: Sonuç verisi her iki grupta tutarlı toplanmış mı?
+E: Karıştırıcı değişken (confound) var mı?
+G: Grup ataması seçkisiz (random assignment) mı?
+H: SADECE G="Evet" ise değerlendir, aksi halde c:"NA". İyi uygulanmış randomizasyon mu?
+I: SADECE G="Evet" ve H="Evet" ise değerlendir, aksi halde c:"NA". Örneklem kaybı yüksek yanlılık riski taşıyor mu?
+L: Her zaman değerlendir. Başlangıç düzeyi SMD <= 0.05 SD mi? Makaledeki SMD değerini sayısal olarak "smd" alanına yaz (yoksa null).
+M: SADECE L="Hayır" ise değerlendir, aksi halde c:"NA". SMD <= 0.25 SD VE istatistiksel düzeltme yapılmış mı?
+
+Her madde için c ("E", "H", veya "NA"), g (maksimum 15 kelime gerekçe), k (kanıt yeri, örn: "Yöntem s.4"), conf ("yuksek"|"orta"|"dusuk") alanlarını doldur.
+SADECE aşağıdaki JSON formatında yanıt ver:
+{"baslik":"kısa çalışma adı","olcum":"birincil sonuç ölçümü","diger_olcumler":"","yol":{"A":{"c":"E|H","g":"...","k":"...","conf":"yuksek|orta|dusuk"},"B":{...},"C":{...},"D":{...},"E":{...},"G":{...},"H":{"c":"E|H|NA","g":"..."},"I":{"c":"E|H|NA","g":"..."},"L":{"c":"E|H","g":"...","k":"...","conf":"...","smd":0.03},"M":{"c":"E|H|NA","g":"..."}}}`;
+
+async function callGemini(apiKey, pdfBase64) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const payload = {
+    contents: [
+      {
+        parts: [
+          { inline_data: { mime_type: "application/pdf", data: pdfBase64 } },
+          { text: SYSTEM_PROMPT }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      response_mime_type: "application/json"
+    }
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || 'Gemini API bağlantısı başarısız oldu.');
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Modelden geçerli bir yanıt alınamadı.');
+  return JSON.parse(text);
+}
+
 startBtn.addEventListener('click', async () => {
-  showError('AI ile otomatik analiz için bir arka plan API servisi gereklidir. Lütfen "Manuel Değerlendirmeyi Başlat" butonunu kullanarak devam ediniz.');
+  if (!base64Data) return;
+  const apiKey = apiKeyInput.value.trim();
+  if (!apiKey) {
+    showError('Lütfen geçerli bir Google Gemini API anahtarı giriniz.');
+    return;
+  }
+
+  startBtn.disabled = true;
+  errorEl.style.display = 'none';
+  statusEl.style.display = 'block';
+  statusText.textContent = 'AI makaleyi inceliyor ve değerlendiriyor';
+
+  try {
+    const parsed = await callGemini(apiKey, base64Data);
+    aiPath = parsed.yol || {};
+    studyInfo = { baslik: parsed.baslik, olcum: parsed.olcum, diger_olcumler: parsed.diger_olcumler };
+    document.getElementById('intake').style.display = 'none';
+    document.getElementById('checklistBox').removeAttribute('open');
+    perf1.style.display = 'block';
+    wizardEl.style.display = 'block';
+    renderCrumbs();
+    advanceSequence();
+  } catch(err) {
+    showError('AI Analiz Hatası: ' + err.message);
+    startBtn.disabled = false;
+  } finally {
+    statusEl.style.display = 'none';
+  }
 });
 
 function renderCrumbs(){
@@ -678,6 +777,7 @@ function renderWizardStep(){
         '<div class="wq">' + escapeHtml(node.q) + '</div>' +
         '<div class="wguide">' + escapeHtml(node.guide) + '</div>' +
         (node.ipucu ? '<div class="whint"><b>📍 Nereye Bakmalısınız?</b>' + escapeHtml(node.ipucu) + '</div>' : '') +
+        (sug ? confBox(sug) : '') +
         '<div class="smd-input"><input type="number" step="0.001" min="0" id="smdField" value="' + prefill + '" placeholder="0.00" /><span>SD</span></div>' +
         '<div class="smd-preview" id="smdPreview">Bir değer girin.</div>' +
         '<button type="button" class="calc-toggle" id="calcToggle">🧮 SMD değerini bilmiyorum — ortalama/SS/N değerlerinden hesapla</button>' +
@@ -856,6 +956,9 @@ function finishWizard(){
 
   let metaHtml = '<div><b>Çalışma</b>' + escapeHtml(studyInfo.baslik || '—') + '</div>' +
                  '<div><b>Değerlendirilen Ölçüm</b>' + escapeHtml(studyInfo.olcum || '—') + '</div>';
+  if (studyInfo.diger_olcumler){
+    metaHtml += '<div><b>Diğer Ölçümler</b>' + escapeHtml(studyInfo.diger_olcumler) + ' (bu değerlendirmeye dahil değil)</div>';
+  }
   studyMetaEl.innerHTML = metaHtml;
   studyMetaEl.style.display = 'block';
 
